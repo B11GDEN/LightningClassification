@@ -1,0 +1,18 @@
+# dataset
+dataset_name:
+  desc: Dataset name (cifar10, imagenet, ...)
+  value: imagenet
+num_workers:
+  desc: Number of workers
+  value: 0
+batch_size:
+  desc: Size of each mini-batch
+  value: 128
+
+# train
+epochs:
+  desc: Number of epochs to train over
+  value: 30
+accelerator:
+  desc: gpu, cpu
+  value: gpu
