@@ -1,12 +1,14 @@
 import timm
 import wandb
+from pathlib import Path
 
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import LearningRateMonitor
 from pytorch_lightning.callbacks.progress import RichProgressBar
 from pytorch_lightning.loggers import WandbLogger
 
-from pl_bolts.datamodules import CIFAR10DataModule, ImagenetDataModule
+from pl_bolts.datamodules import CIFAR10DataModule
+from src.datamodule.imagenet import ImagenetDataModule
 
 from src.utils.transform import get_cifar10_transform, get_imagenet_transform
 from src.model.lit_classifier import LitClassifier
@@ -33,12 +35,10 @@ def main():
         case 'imagenet':
             train_transforms, test_transforms = get_imagenet_transform()
             datamodule = ImagenetDataModule(
-                data_dir='datasets/tiny-imagenet-200',
+                data_dir=Path('datasets/tiny-imagenet-200'),
+                config_dir=Path(''),
                 batch_size=wandb.config['batch_size'],
                 num_workers=wandb.config['num_workers'],
-                # train_transforms=train_transforms,
-                # test_transforms=test_transforms,
-                # val_transforms=test_transforms,
             )
         case _:
             print('Unknown dataset name')
@@ -53,7 +53,7 @@ def main():
             num_layers=6,
             patch_size=16,
             num_channels=3,
-            num_patches=4,
+            num_patches=196,
             num_classes=datamodule.num_classes,
             dropout=0.0
         )

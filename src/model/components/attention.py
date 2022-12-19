@@ -1,9 +1,13 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
 
 class Attention(nn.Module):
-    def __init__(self, dim, num_heads=8, qkv_bias=True, attn_drop=0., proj_drop=0.):
+    def __init__(
+            self, dim: int, num_heads: int = 8,
+            qkv_bias: bool = True, attn_drop: float = 0., proj_drop: float = 0.
+    ):
         super().__init__()
         assert dim % num_heads == 0, 'dim should be divisible by num_heads'
         self.num_heads = num_heads
@@ -15,15 +19,6 @@ class Attention(nn.Module):
         self.attn_drop = nn.Dropout(attn_drop)
         self.proj = nn.Linear(dim, dim)
         self.proj_drop = nn.Dropout(proj_drop)
-
-        self._reset_parameters()
-
-    def _reset_parameters(self):
-        # Original Transformer initialization, see PyTorch documentation
-        nn.init.xavier_uniform_(self.qkv.weight)
-        if self.qkv_bias:
-            self.qkv.bias.data.fill_(0)
-        nn.init.xavier_uniform_(self.proj.weight)
 
     def forward(self, x):
         B, N, C = x.shape
@@ -52,8 +47,9 @@ kernels = {
 
 class LinearAttention(nn.Module):
     def __init__(
-            self, dim, num_heads=8, qkv_bias=True, kv_drop=0., proj_drop=0.,
-            q_kernel='l2', k_kernel='l2',
+            self, dim: int, num_heads: int = 8,
+            qkv_bias: bool = True, kv_drop: float = 0., proj_drop: float = 0.,
+            q_kernel: str = 'l2', k_kernel: str = 'l2',
     ):
         super().__init__()
         assert dim % num_heads == 0, 'dim should be divisible by num_heads'
@@ -70,15 +66,6 @@ class LinearAttention(nn.Module):
         self.q_kernel = kernels[q_kernel]
         self.k_kernel = kernels[k_kernel]
 
-        self._reset_parameters()
-
-    def _reset_parameters(self):
-        # Original Transformer initialization, see PyTorch documentation
-        nn.init.xavier_uniform_(self.qkv.weight)
-        if self.qkv_bias:
-            self.qkv.bias.data.fill_(0)
-        nn.init.xavier_uniform_(self.proj.weight)
-
     def forward(self, x):
         B, N, C = x.shape
         qkv = self.qkv(x).reshape(B, N, 3, self.num_heads, C // self.num_heads).permute(2, 0, 3, 1, 4)
@@ -94,3 +81,9 @@ class LinearAttention(nn.Module):
         x = self.proj_drop(x)
 
         return x
+
+if __name__ == "__main__":
+    attn = Attention(
+        dim=768, num_heads=12,
+    )
+    inp = torch.FloatTensor
