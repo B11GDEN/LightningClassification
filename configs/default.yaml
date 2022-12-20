@@ -1,13 +1,33 @@
+# attention parameter
+dim:
+  desc: q, k, v dimensions
+  value: 768
+num_heads:
+  desc: number of heads
+  value: 12
+q_kernel:
+  desc: query kernel type
+  value: l2
+k_kernel:
+  desc: key kernel type
+  value: l2
+qkv_bias:
+  value: True
+kv_drop:
+  value: 0.
+proj_drop:
+  value: 0.
+
 # dataset
 dataset_name:
   desc: Dataset name (cifar10, imagenet, ...)
-  value: imagenet
+  value: cifar10
 num_workers:
   desc: Number of workers
   value: 0
 batch_size:
   desc: Size of each mini-batch
-  value: 128
+  value: 8
 
 # train
 epochs:

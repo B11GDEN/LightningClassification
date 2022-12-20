@@ -6,6 +6,7 @@ def get_cifar10_transform():
 
     train_transforms = torchvision.transforms.Compose(
         [
+            torchvision.transforms.Resize(224),
             torchvision.transforms.RandomHorizontalFlip(),
             torchvision.transforms.ToTensor(),
             cifar10_normalization(),
@@ -14,6 +15,7 @@ def get_cifar10_transform():
 
     test_transforms = torchvision.transforms.Compose(
         [
+            torchvision.transforms.Resize(224),
             torchvision.transforms.ToTensor(),
             cifar10_normalization(),
         ]

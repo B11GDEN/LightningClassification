@@ -12,7 +12,8 @@ from src.datamodule.imagenet import ImagenetDataModule
 
 from src.utils.transform import get_cifar10_transform, get_imagenet_transform
 from src.model.lit_classifier import LitClassifier
-from src.model.standart_vit1 import VisionTransformer
+from src.model.components import LinearAttention, get_all_parent_layers
+from timm.models.vision_transformer import VisionTransformer, Attention
 
 
 def main():
@@ -21,6 +22,7 @@ def main():
         config='configs/default.yaml'
     )
 
+    # define datamodule
     match wandb.config['dataset_name']:
         case 'cifar10':
             train_transforms, test_transforms = get_cifar10_transform()
@@ -45,25 +47,26 @@ def main():
             wandb.finish()
             return
 
-    model = LitClassifier(
-        net= VisionTransformer(
-            embed_dim=256,
-            hidden_dim=512,
-            num_heads=8,
-            num_layers=6,
-            patch_size=16,
-            num_channels=3,
-            num_patches=196,
-            num_classes=datamodule.num_classes,
-            dropout=0.0
+    # define net and change attention type
+    net = VisionTransformer()
+    for parent_layer, last_token in get_all_parent_layers(net, Attention):
+        setattr(
+            parent_layer, last_token,
+            LinearAttention(
+                dim=768, num_heads=12,
+                qkv_bias=True, kv_drop=0., proj_drop=0.,
+                q_kernel='l2', k_kernel='l2',
+            )
         )
-    )
+    model = LitClassifier(net=net)
 
+    # define callbacks
     callbacks = [
         LearningRateMonitor(logging_interval='epoch'),
         RichProgressBar()
     ]
 
+    # start train cycle
     trainer = Trainer(
         max_epochs=wandb.config['epochs'],
         accelerator=wandb.config['accelerator'],
