@@ -53,9 +53,13 @@ def main():
         setattr(
             parent_layer, last_token,
             LinearAttention(
-                dim=768, num_heads=12,
-                qkv_bias=True, kv_drop=0., proj_drop=0.,
-                q_kernel='l2', k_kernel='l2',
+                dim=wandb.config['dim'],
+                num_heads=wandb.config['num_heads'],
+                qkv_bias=wandb.config['qkv_bias'],
+                kv_drop=wandb.config['kv_drop'],
+                proj_drop=wandb.config['proj_drop'],
+                q_kernel=wandb.config['q_kernel'],
+                k_kernel=wandb.config['k_kernel'],
             )
         )
     model = LitClassifier(net=net)
