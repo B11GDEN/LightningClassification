@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-class Attention(nn.Module):
+class StandartAttention(nn.Module):
     def __init__(
             self, dim: int, num_heads: int = 8,
             qkv_bias: bool = True, attn_drop: float = 0., proj_drop: float = 0.
@@ -82,8 +82,19 @@ class LinearAttention(nn.Module):
 
         return x
 
+
 if __name__ == "__main__":
-    attn = Attention(
+    b, n, c = 16, 20, 768
+    a = torch.rand(b, n, c)
+
+    attn = StandartAttention(
         dim=768, num_heads=12,
     )
-    inp = torch.FloatTensor
+    y = attn(a)
+    print(y.shape)
+
+    linear_attn = LinearAttention(
+        dim=768, num_heads=12
+    )
+    y = linear_attn(a)
+    print(y.shape)

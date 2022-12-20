@@ -12,7 +12,7 @@ from src.datamodule.imagenet import ImagenetDataModule
 
 from src.utils.transform import get_cifar10_transform, get_imagenet_transform
 from src.model.lit_classifier import LitClassifier
-from src.model.vit import VisionTransformer
+from src.model.standart_vit1 import VisionTransformer
 
 
 def main():
@@ -35,8 +35,8 @@ def main():
         case 'imagenet':
             train_transforms, test_transforms = get_imagenet_transform()
             datamodule = ImagenetDataModule(
-                data_dir=Path('datasets/tiny-imagenet-200'),
-                config_dir=Path(''),
+                data_dir=Path('datasets/ILSVRC/DATA/CLS-LOC'),
+                config_dir=Path('datasets'),
                 batch_size=wandb.config['batch_size'],
                 num_workers=wandb.config['num_workers'],
             )
