@@ -2,11 +2,12 @@ from typing import Any, List
 
 import torch
 from torch.optim import AdamW
+from torch.optim.lr_scheduler import CosineAnnealingLR
 from pytorch_lightning import LightningModule
 from torchmetrics import MaxMetric, MeanMetric
 from torchmetrics.classification.accuracy import Accuracy
 
-from pl_bolts.optimizers.lr_scheduler import LinearWarmupCosineAnnealingLR
+# from pl_bolts.optimizers.lr_scheduler import LinearWarmupCosineAnnealingLR
 
 
 class LitClassifier(LightningModule):
@@ -99,6 +100,7 @@ class LitClassifier(LightningModule):
 
     def configure_optimizers(self):
         optimizer = AdamW(self.parameters(), lr=1e-3)
-        sheduler = LinearWarmupCosineAnnealingLR(
-            optimizer, warmup_epochs=5, max_epochs=self.trainer.max_epochs)
+        # sheduler = LinearWarmupCosineAnnealingLR(
+        #     optimizer, warmup_epochs=5, warmup_start_lr=1e-7, max_epochs=self.trainer.max_epochs)
+        sheduler = CosineAnnealingLR(optimizer, T_max=self.trainer.max_epochs)
         return [optimizer], [sheduler]

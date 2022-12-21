@@ -21,13 +21,13 @@ proj_drop:
 # dataset
 dataset_name:
   desc: Dataset name (cifar10, imagenet, ...)
-  value: cifar10
+  value: imagenet
 num_workers:
   desc: Number of workers
-  value: 0
+  value: 12
 batch_size:
   desc: Size of each mini-batch
-  value: 8
+  value: 256
 
 # trainer
 epochs:

@@ -7,10 +7,7 @@ from pytorch_lightning.callbacks import LearningRateMonitor
 from pytorch_lightning.callbacks.progress import RichProgressBar
 from pytorch_lightning.loggers import WandbLogger
 
-from pl_bolts.datamodules import CIFAR10DataModule
 from src.datamodule.imagenet import ImagenetDataModule
-
-from src.utils.transform import get_cifar10_transform, get_imagenet_transform
 from src.model.lit_classifier import LitClassifier
 from src.model.components import LinearAttention, get_all_parent_layers
 from timm.models.vision_transformer import VisionTransformer, Attention
@@ -19,25 +16,14 @@ from timm.models.vision_transformer import VisionTransformer, Attention
 def main():
     logger = WandbLogger(
         project='Transformer',
-        config='configs/default.yaml'
+        config='configs/ddp.yaml'
     )
 
     # define datamodule
     match wandb.config['dataset_name']:
-        case 'cifar10':
-            train_transforms, test_transforms = get_cifar10_transform()
-            datamodule = CIFAR10DataModule(
-                data_dir='datasets',
-                batch_size=wandb.config['batch_size'],
-                num_workers=wandb.config['num_workers'],
-                train_transforms=train_transforms,
-                test_transforms=test_transforms,
-                val_transforms=test_transforms,
-            )
         case 'imagenet':
-            train_transforms, test_transforms = get_imagenet_transform()
             datamodule = ImagenetDataModule(
-                data_dir=Path('datasets/ILSVRC/DATA/CLS-LOC'),
+                data_dir=Path('datasets/ILSVRC/Data/CLS-LOC'),
                 config_dir=Path('datasets'),
                 batch_size=wandb.config['batch_size'],
                 num_workers=wandb.config['num_workers'],

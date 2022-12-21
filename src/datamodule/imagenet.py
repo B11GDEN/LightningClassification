@@ -66,7 +66,8 @@ class ImagenetDataModule(LightningDataModule):
                  batch_size: int = 32,
                  image_size: int = 224,
                  num_workers: int = 0,
-                 pin_memory: bool = False,
+                 persistent_workers: bool = True,
+                 pin_memory: bool = True,
                  drop_last: bool = False,
                  ):
         super().__init__()
@@ -75,6 +76,7 @@ class ImagenetDataModule(LightningDataModule):
         self.batch_size = batch_size
         self.image_size = image_size
         self.num_workers = num_workers
+        self.persistent_workers = persistent_workers
         self.pin_memory = pin_memory
         self.drop_last = drop_last
 
@@ -83,35 +85,30 @@ class ImagenetDataModule(LightningDataModule):
         self.test_ds: Optional[ImagenetDataset] = None
 
     def setup(self, stage: Optional[str] = None):
-        # if not self.train_ds and not self.val_ds and not self.test_ds:
-        transform = albu.Compose(
-            [
-                albu.PadIfNeeded(
-                    self.image_size, self.image_size,
-                    border_mode=cv2.BORDER_CONSTANT,
-                    value=0,
-                ),
-                albu.CenterCrop(self.image_size, self.image_size),
-                albu.Normalize(),
-                ToTensorV2()
-            ]
-        )
-        self.train_ds = ImagenetDataset(
-            data_path=Path(self.data_dir / "train"),
-            conf_path=Path(self.config_dir / "LOC_train_solution.csv"),
-            transform=transform,
-            train=True,
-        )
-        self.val_ds = ImagenetDataset(
-            data_path=Path(self.data_dir / "val"),
-            conf_path=Path(self.config_dir / "LOC_val_solution.csv"),
-            transform=transform,
-        )
-        self.test_ds = ImagenetDataset(
-            data_path=Path(self.data_dir / "test"),
-            conf_path=Path(self.config_dir / "LOC_sample_submission.csv"),
-            transform=transform,
-        )
+        if not self.train_ds and not self.val_ds and not self.test_ds:
+            transform = albu.Compose(
+                [
+                    albu.Resize(self.image_size, self.image_size),
+                    albu.Normalize(),
+                    ToTensorV2()
+                ]
+            )
+            self.train_ds = ImagenetDataset(
+                data_path=Path(self.data_dir / "train"),
+                conf_path=Path(self.config_dir / "LOC_train_solution.csv"),
+                transform=transform,
+                train=True,
+            )
+            self.val_ds = ImagenetDataset(
+                data_path=Path(self.data_dir / "val"),
+                conf_path=Path(self.config_dir / "LOC_val_solution.csv"),
+                transform=transform,
+            )
+            self.test_ds = ImagenetDataset(
+                data_path=Path(self.data_dir / "test"),
+                conf_path=Path(self.config_dir / "LOC_sample_submission.csv"),
+                transform=transform,
+            )
 
     @property
     def num_classes(self):
@@ -124,6 +121,7 @@ class ImagenetDataModule(LightningDataModule):
                           num_workers=self.num_workers,
                           drop_last=self.drop_last,
                           pin_memory=self.pin_memory,
+                          persistent_workers=self.persistent_workers,
                           )
 
     def val_dataloader(self) -> DataLoader:
@@ -133,6 +131,7 @@ class ImagenetDataModule(LightningDataModule):
                           num_workers=self.num_workers,
                           drop_last=self.drop_last,
                           pin_memory=self.pin_memory,
+                          persistent_workers=self.persistent_workers,
                           )
 
     def test_dataloader(self) -> DataLoader:
@@ -142,4 +141,5 @@ class ImagenetDataModule(LightningDataModule):
                           num_workers=self.num_workers,
                           drop_last=self.drop_last,
                           pin_memory=self.pin_memory,
+                          persistent_workers=self.persistent_workers,
                           )
