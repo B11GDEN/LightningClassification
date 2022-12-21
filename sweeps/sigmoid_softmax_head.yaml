@@ -1,0 +1,14 @@
+program: main.py
+project: Transformer
+name: "Sigmoid Softmax Head"
+method: grid
+metric:
+  name: test/acc
+  goal: maximize
+parameters:
+  num_heads:
+    values: [1, 3, 6, 16, 32, 192]
+  q_kernel:
+    value: sigmoid
+  k_kernel:
+    value: softmax

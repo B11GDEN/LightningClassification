@@ -1,0 +1,14 @@
+program: main.py
+project: Transformer
+name: "Test different kernel"
+method: grid
+metric:
+  name: test/acc
+  goal: maximize
+parameters:
+  num_heads:
+    value: 192
+  q_kernel:
+    values:  ["l1", "l2", "tanh", "softmax", "sigmoid"]
+  k_kernel:
+    values:  ["l1", "l2", "tanh", "softmax", "sigmoid"]
