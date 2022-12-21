@@ -29,10 +29,14 @@ batch_size:
   desc: Size of each mini-batch
   value: 8
 
-# train
+# trainer
 epochs:
   desc: Number of epochs to train over
   value: 30
 accelerator:
   desc: gpu, cpu
   value: gpu
+gpus:
+  value: None
+strategy:
+  value: None

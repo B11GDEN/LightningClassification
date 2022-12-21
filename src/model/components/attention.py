@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
+from functools import partial
 
 class StandartAttention(nn.Module):
     def __init__(
@@ -37,11 +37,11 @@ class StandartAttention(nn.Module):
 
 
 kernels = {
-    'l1': lambda x: F.normalize(x, p=1.0, dim=-1),
-    'l2': lambda x: F.normalize(x, p=2.0, dim=-1),
-    'tanh': lambda x: F.tanh(x),
-    'softmax': lambda x: F.softmax(x, dim=-1),
-    'sigmoid': lambda x: F.sigmoid(x),
+    'l1': partial(F.normalize, p=1.0, dim=-1),
+    'l2': partial(F.normalize, p=2.0, dim=-1),
+    'tanh': F.tanh,
+    'softmax': partial(F.softmax, dim=-1),
+    'sigmoid': F.sigmoid,
 }
 
 

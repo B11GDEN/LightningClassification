@@ -44,7 +44,7 @@ def main():
             )
         case _:
             print('Unknown dataset name')
-            wandb.finish()
+            # wandb.finish()
             return
 
     # define net and change attention type
@@ -82,7 +82,7 @@ def main():
     trainer.fit(model, datamodule)
     trainer.test(model, datamodule=datamodule)
 
-    wandb.finish()
+    # wandb.finish()
 
 
 if __name__ == '__main__':
