@@ -8,6 +8,7 @@ from pytorch_lightning.callbacks.progress import RichProgressBar
 from pytorch_lightning.loggers import WandbLogger
 
 from src.datamodule.imagenet import ImagenetDataModule
+from src.datamodule.cifar100 import Cifar100DataModule
 from src.model.lit_classifier import LitClassifier
 from src.model.components import LinearAttention, get_all_parent_layers
 from timm.models.vision_transformer import VisionTransformer, Attention
@@ -16,14 +17,20 @@ from timm.models.vision_transformer import VisionTransformer, Attention
 def main():
     logger = WandbLogger(
         project='Transformer',
-        config='configs/ddp.yaml'
+        config='configs/default.yaml'
     )
 
     # define datamodule
     match wandb.config['dataset_name']:
+        case 'cifar100':
+            datamodule = Cifar100DataModule(
+                data_dir=Path('./datasets/cifar-100-python'),
+                batch_size=wandb.config['batch_size'],
+                num_workers=wandb.config['num_workers'],
+            )
         case 'imagenet':
             datamodule = ImagenetDataModule(
-                data_dir=Path('datasets/ILSVRC/Data/CLS-LOC'),
+                data_dir=Path('./datasets/ILSVRC/Data/CLS-LOC'),
                 config_dir=Path('datasets'),
                 batch_size=wandb.config['batch_size'],
                 num_workers=wandb.config['num_workers'],
@@ -34,7 +41,15 @@ def main():
             return
 
     # define net and change attention type
-    net = VisionTransformer()
+    # net = timm.create_model(wandb.config['model_name'], pretrained=False)
+    net = VisionTransformer(
+        img_size=32,
+        patch_size=4,
+        num_classes=100,
+        embed_dim=192,
+        depth=12,
+        num_heads=3,
+    )
     for parent_layer, last_token in get_all_parent_layers(net, Attention):
         setattr(
             parent_layer, last_token,
@@ -62,7 +77,7 @@ def main():
         accelerator=wandb.config['accelerator'],
         logger=logger,
         callbacks=callbacks,
-        track_grad_norm=2,
+        limit_train_batches=1.0,
     )
 
     trainer.fit(model, datamodule)
