@@ -25,18 +25,18 @@ proj_drop:
 # dataset
 dataset_name:
   desc: Dataset name (cifar100, imagenet, ...)
-  value: cifar100
+  value: cifar10
 num_workers:
   desc: Number of workers
-  value: 0
+  value: 24
 batch_size:
   desc: Size of each mini-batch
-  value: 256
+  value: 4096
 
 # trainer
 epochs:
   desc: Number of epochs to train over
-  value: 30
+  value: 100
 accelerator:
   desc: gpu, cpu
   value: gpu

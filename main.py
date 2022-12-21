@@ -9,6 +9,7 @@ from pytorch_lightning.loggers import WandbLogger
 
 from src.datamodule.imagenet import ImagenetDataModule
 from src.datamodule.cifar100 import Cifar100DataModule
+from src.datamodule.cifar10 import Cifar10DataModule
 from src.model.lit_classifier import LitClassifier
 from src.model.components import LinearAttention, get_all_parent_layers
 from timm.models.vision_transformer import VisionTransformer, Attention
@@ -22,6 +23,12 @@ def main():
 
     # define datamodule
     match wandb.config['dataset_name']:
+        case 'cifar10':
+            datamodule = Cifar10DataModule(
+                data_dir=Path('./datasets/cifar-10-batches-py'),
+                batch_size=wandb.config['batch_size'],
+                num_workers=wandb.config['num_workers'],
+            )
         case 'cifar100':
             datamodule = Cifar100DataModule(
                 data_dir=Path('./datasets/cifar-100-python'),
@@ -44,8 +51,8 @@ def main():
     # net = timm.create_model(wandb.config['model_name'], pretrained=False)
     net = VisionTransformer(
         img_size=32,
-        patch_size=4,
-        num_classes=100,
+        patch_size=8,
+        num_classes=10,
         embed_dim=192,
         depth=12,
         num_heads=3,

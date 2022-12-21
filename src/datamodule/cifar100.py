@@ -67,7 +67,16 @@ class Cifar100DataModule(LightningDataModule):
 
     def setup(self, stage: Optional[str] = None):
         if not self.train_ds and not self.val_ds and not self.test_ds:
-            transform = albu.Compose(
+            train_transform = albu.Compose(
+                [
+                    albu.HorizontalFlip(),
+                    albu.ShiftScaleRotate(),
+                    albu.ColorJitter(),
+                    albu.Normalize(),
+                    ToTensorV2()
+                ]
+            )
+            test_transform = albu.Compose(
                 [
                     albu.Normalize(),
                     ToTensorV2()
@@ -75,15 +84,15 @@ class Cifar100DataModule(LightningDataModule):
             )
             self.train_ds = Cifar100Dataset(
                 file=self.data_dir / 'train',
-                transform=transform,
+                transform=train_transform,
             )
             self.val_ds = Cifar100Dataset(
                 file=self.data_dir / 'test',
-                transform=transform,
+                transform=train_transform,
             )
             self.test_ds = Cifar100Dataset(
                 file=self.data_dir / 'test',
-                transform=transform,
+                transform=test_transform,
             )
 
     @property

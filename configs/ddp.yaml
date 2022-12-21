@@ -31,16 +31,16 @@ num_workers:
   value: 12
 batch_size:
   desc: Size of each mini-batch
-  value: 512
+  value: 2048
 
 # trainer
 epochs:
   desc: Number of epochs to train over
-  value: 50
+  value: 100
 accelerator:
   desc: gpu, cpu
   value: gpu
 gpus:
-  value: 4
+  value: 3
 strategy:
   value: ddp
